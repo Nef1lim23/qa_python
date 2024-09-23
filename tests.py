@@ -1,24 +1,120 @@
+import pytest
+
 from main import BooksCollector
+
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
 # обязательно указывать префикс Test
 class TestBooksCollector:
+    def test_init_add_new_genre_added_new_genre(self):
+        new_genre = BooksCollector()
+        new_genre.genre.append('Документалка')
+        assert new_genre.genre[-1] == 'Документалка'
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
-        # создаем экземпляр (объект) класса BooksCollector
+    def test_init_delete_last_genre_from_list_genre(self):
+        delete_from_genre_list = BooksCollector()
+        delete_from_genre_list.genre.pop()
+        assert delete_from_genre_list.genre == ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы']
+
+    @pytest.mark.parametrize('name', ['Гарри Поттер и Филосовский камень',
+                                      '1894',
+                                      'Гарри Поттер и Узник Азкабана'])
+    def test_add_new_books(self, name):
+        add_book = BooksCollector()
+        add_book.add_new_book(name)
+        assert name in add_book.books_genre
+
+    def test_set_book_genre_one_book_added_genre(self):
         collector = BooksCollector()
 
-        # добавляем две книги
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+        collector.add_new_book("Ржавый котел")
+        collector.set_book_genre('Ржавый котел', 'Фантастика')
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+        assert collector.books_genre == {'Ржавый котел': 'Фантастика'}
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+    def test_get_book_genre_one_genre_genre_received(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Гарри Поттер и Узник Азкабана')
+        collector.set_book_genre('Гарри Поттер и Узник Азкабана', 'Фантастика')
+
+        name_genre = 'Гарри Поттер и Узник Азкабана'
+
+        assert collector.get_book_genre(name_genre) == 'Фантастика'
+
+    def test_get_books_with_specific_genre_three_books_get_two_books(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Гарри Поттер и Узник Азкабана')
+        collector.set_book_genre('Гарри Поттер и Узник Азкабана', 'Фантастика')
+
+        collector.add_new_book('Гарри Поттер и Орден Феникса')
+        collector.set_book_genre('Гарри Поттер и Орден Феникса', 'Фантастика')
+
+        collector.add_new_book('Шерлок Холмс')
+        collector.set_book_genre('Шерлок Холмс', 'Детективы')
+
+        assert collector.get_books_with_specific_genre('Фантастика') == ['Гарри Поттер и Узник Азкабана',
+                                                                         'Гарри Поттер и Орден Феникса']
+
+    def test_get_books_genre_two_books_with_genre_two_books_in_dictionary(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Лжец')
+        collector.set_book_genre('Лжец', 'Комедии')
+
+        collector.add_new_book('Доктор Сон')
+        collector.set_book_genre('Доктор Сон', 'Ужасы')
+
+        assert collector.books_genre == {'Лжец': 'Комедии',
+                                         'Доктор Сон': 'Ужасы'}
+
+    def test_get_books_for_children_three_books_one_has_been_added(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Доктор Сон')
+        collector.set_book_genre('Доктор Сон', 'Ужасы')
+
+        collector.add_new_book('Последнее дело Холмса')
+        collector.set_book_genre('Последнее дело Холмса', 'Детективы')
+
+        collector.add_new_book('Гарри Поттер и Узник Азкабана')
+        collector.set_book_genre('Гарри Поттер и Узник Азкабана', 'Фантастика')
+
+        assert collector.get_books_for_children() == ['Гарри Поттер и Узник Азкабана']
+
+    def test_add_book_in_favorites_two_books_books_added(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Доктор Сон')
+        collector.add_new_book('Последнее дело Холмса')
+
+        collector.add_book_in_favorites('Доктор Сон')
+        collector.add_book_in_favorites('Последнее дело Холмса')
+        collector.add_book_in_favorites('Адский рай')
+
+        assert collector.favorites == ['Доктор Сон', 'Последнее дело Холмса']
+
+    def test_delete_book_from_favorites_two_book_one_was_deleted(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Доктор Сон')
+        collector.add_new_book('Последнее дело Холмса')
+
+        collector.add_book_in_favorites('Доктор Сон')
+        collector.add_book_in_favorites('Последнее дело Холмса')
+
+        collector.delete_book_from_favorites('Доктор Сон')
+
+        assert collector.favorites == ['Последнее дело Холмса']
+
+    def test_get_list_of_favorites_books_received_list(self):
+        collector = BooksCollector()
+
+        collector.add_new_book('Доктор Сон')
+        collector.add_new_book('Последнее дело Холмса')
+
+        collector.add_book_in_favorites('Доктор Сон')
+        collector.add_book_in_favorites('Последнее дело Холмса')
+
+        assert collector.favorites == ['Доктор Сон', 'Последнее дело Холмса']
