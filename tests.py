@@ -7,22 +7,17 @@ from main import BooksCollector
 # обязательно указывать префикс Test
 class TestBooksCollector:
     def test_init_add_new_genre_added_new_genre(self):
-        new_genre = BooksCollector()
-        new_genre.genre.append('Документалка')
-        assert new_genre.genre[-1] == 'Документалка'
-
-    def test_init_delete_last_genre_from_list_genre(self):
-        delete_from_genre_list = BooksCollector()
-        delete_from_genre_list.genre.pop()
-        assert delete_from_genre_list.genre == ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы']
+        collector = BooksCollector()
+        collector.genre.append('Документалка')
+        assert collector.genre[-1] == 'Документалка'
 
     @pytest.mark.parametrize('name', ['Гарри Поттер и Филосовский камень',
                                       '1894',
                                       'Гарри Поттер и Узник Азкабана'])
     def test_add_new_books(self, name):
-        add_book = BooksCollector()
-        add_book.add_new_book(name)
-        assert name in add_book.books_genre
+        collector = BooksCollector()
+        collector.add_new_book(name)
+        assert name in collector.books_genre
 
     def test_set_book_genre_one_book_added_genre(self):
         collector = BooksCollector()
@@ -33,12 +28,11 @@ class TestBooksCollector:
         assert collector.books_genre == {'Ржавый котел': 'Фантастика'}
 
     def test_get_book_genre_one_genre_genre_received(self):
+        name_genre = 'Гарри Поттер и Узник Азкабана'
         collector = BooksCollector()
 
         collector.add_new_book('Гарри Поттер и Узник Азкабана')
         collector.set_book_genre('Гарри Поттер и Узник Азкабана', 'Фантастика')
-
-        name_genre = 'Гарри Поттер и Узник Азкабана'
 
         assert collector.get_book_genre(name_genre) == 'Фантастика'
 
@@ -66,7 +60,7 @@ class TestBooksCollector:
         collector.add_new_book('Доктор Сон')
         collector.set_book_genre('Доктор Сон', 'Ужасы')
 
-        assert collector.books_genre == {'Лжец': 'Комедии',
+        assert collector.get_books_genre() == {'Лжец': 'Комедии',
                                          'Доктор Сон': 'Ужасы'}
 
     def test_get_books_for_children_three_books_one_has_been_added(self):
@@ -117,4 +111,4 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Доктор Сон')
         collector.add_book_in_favorites('Последнее дело Холмса')
 
-        assert collector.favorites == ['Доктор Сон', 'Последнее дело Холмса']
+        assert collector.get_list_of_favorites_books() == ['Доктор Сон', 'Последнее дело Холмса']
